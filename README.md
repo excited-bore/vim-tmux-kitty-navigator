@@ -131,11 +131,12 @@ map ctrl+shift+up    kitten pass_keys.py up     ctrl+shift+up
 map ctrl+shift+right kitten pass_keys.py right  ctrl+shift+right
 ```
 
-Also enable `allow_remote_control` and `listen_on` option:
+Also enable `allow_remote_control`, set `listen_on` to a non-'@' value (plays badly with remote control over SSH) and set env to `TMUX=` : 
 
 ```conf
 allow_remote_control yes
 listen_on unix:/tmp/mykitty
+env TMUX=
 ```
 
 **OR**
@@ -143,18 +144,24 @@ listen_on unix:/tmp/mykitty
 Start kitty with the `listen_on` option so that vim can send commands to it.
 
 ```conf
-kitty -o allow_remote_control=yes --listen-on unix:/tmp/mykitty
+kitty -o allow_remote_control=yes --listen-on unix:/tmp/mykitty --env TMUX=
 ```
 
 The listening address can be customized in your vimrc by setting `g:kitty_navigator_listening_on_address`. It defaults to `unix:/tmp/mykitty`.
 
 ### TMUX
 
-Sinds kitty only sets the pathvariables at the initialization of the terminal and does not update, we sadly have to manually restart our pane when entering/closing tmux. Our best and cleanest option is to use an alias for this. 
+Sinds kitty only sets the pathvariables at the initialization of the terminal and does not update, we sadly have to manually restart our pane when entering/closing tmux. Our best and cleanest option is to use a wrapper function for this. 
  
 Put this in your `~.bashrc` or alike:
 ```sh
-alias tmux="kitten @ launch --env TMUX=\"Iexist\" bash -c 'tmux;kitten @ launch --env TMUX= && kitten @ close-window --self' && kitten @ close-window --self"
+function tmux(){
+    if [[ "$#" == 0 ]]; then 
+        kitten @ launch --env TMUX="$TMPDIR/tmux-1000/default" bash -c 'tmux; kitten @ launch --env TMUX= && kitten @ close-window --self' && kitten @ close-window --self
+    else
+        /usr/bin/tmux "$@";
+    fi
+}
 ```
 
 We also need to add to our `.tmux.conf`. If you're ok with the default keybinds (and you'r using [TPM](https://github.com/tmux-plugins/tpm)), just add this snippet to your tmux.conf:

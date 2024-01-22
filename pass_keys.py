@@ -51,12 +51,13 @@ def handle_result(args, result, target_window_id, boss):
     vim_id = "n?vim"
     if w is None:
         return
+     
     if is_env(w):
         print("Tmux passed")
         for keymap in args[2].split(">"):
             encoded = encode_key_mapping(w, keymap)
             w.write_to_child(encoded)
-    if is_process(w, vim_id):  
+    elif is_process(w, vim_id):  
         print("(N)vim passed")
         # Tmux is empty
         for keymap in args[2].split(">"):
