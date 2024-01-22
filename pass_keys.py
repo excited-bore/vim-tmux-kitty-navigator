@@ -2,7 +2,7 @@ import kitty.conf.utils as ku
 from kitty.key_encoding import KeyEvent, parse_shortcut
 from kitty import keys
 import re
-
+import os
 
 def main():
     """ needed but not used """
@@ -45,8 +45,7 @@ def handle_result(args, result, target_window_id, boss):
     if w is None:
         return
 
-    # Tmux does not represent itself as a childprocess as of kitty v0.31
-    if not w.child.foreground_processes:
+    if "attached" in os.popen("tmux list-sessions").read():
         print("Tmux passed")
         for keymap in args[2].split(">"):
             encoded = encode_key_mapping(w, keymap)
