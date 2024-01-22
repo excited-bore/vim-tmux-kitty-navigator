@@ -9,7 +9,8 @@ This plugin is a combined port from
 [kitty-vim-tmux-navigator](https://github.com/knubie/vim-kitty-navigator) didn't work so I decided to make my own port that only works but also works 3 layers deep (Navigation for vim splits, inside tmux, inside kitty). 
 The aim is excactly the same: to make navigation between Kitty windows, tmux panes, and vim splits seamless. 
 
-The script works by letting a childprocess of kitty (kitten) detect what kind of programs are running and passing encoded keymappings based on whether it's vim or tmux. Sadly, detecting whether tmux is running through SSH is something that can't be done using the current method. SSH itself can be detected though, so sending keymappings to a ssh-session that starts up using tmux is a possibility. Further explained in the SSH section.
+The script works by letting a childprocess of kitty (kitten) detect what kind of programs are running and passing encoded keymappings based on whether it's vim. 
+For tmux, wich is set using pathvariables, we have to reinitialize our pane everytime we start/close a tmux session so we can manually appoint tmux' pathvariable.
 
 
 **NOTE**:
@@ -23,7 +24,7 @@ One big difference is that all the other plugins start with vim-motion based bin
 I don't use these, so this plugin comes with basic arrow key bindings at default.
 
 The following mappings are provided for you to move between
-Vim splits, tmux panes, and kitty window seamlessly.
+vim splits, tmux panes, and kitty window seamlessly.
 
 - `<ctrl-shift-left>` => Left
 - `<ctrl-shift-down>` => Down
@@ -46,7 +47,6 @@ Add the following line to your `~/.vimrc` file
 
 ```vim
 Plug 'excited-bore/vim-tmux-kitty-navigator', { 'do': 'cp -f ./*.py ~/.config/kitty/'}
-
 ```
 And then run the plugin installation function (`PlugInstall`)
 
@@ -84,7 +84,6 @@ Plugin 'excited-bore/vim-tmux-kitty-navigator', { 'afterInstall': 'AfterInstallK
 function! AfterInstallKittyTmuxVim()
     call system('(cd ~/.vim/plugins/vim-tmux-kitty-navigator && cp -f ./*.py ~/.config/kitty/)')
 endf
-
 ```
 
 If you want to use custom keybinds, set `let g:tmux_kitty_navigator_no_mappings = 1`
@@ -151,7 +150,14 @@ The listening address can be customized in your vimrc by setting `g:kitty_naviga
 
 ### TMUX
 
-If you're ok with the default keybinds (and you'r using [TPM](https://github.com/tmux-plugins/tpm)), just add this snippet to your tmux.conf:
+Sinds kitty only sets the pathvariables at the initialization of the terminal and does not update, we sadly have to manually restart our pane when entering/closing tmux. Our best and cleanest option is to use an alias for this. 
+ 
+Put this in your `~.bashrc` or alike:
+```sh
+alias tmux="kitten @ launch --env TMUX=\"Iexist\" bash -c 'tmux;kitten @ launch --env TMUX= && kitten @ close-window --self' && kitten @ close-window --self"
+```
+
+We also need to add to our `.tmux.conf`. If you're ok with the default keybinds (and you'r using [TPM](https://github.com/tmux-plugins/tpm)), just add this snippet to your tmux.conf:
 
 ```conf
 set -g @plugin 'excited-bore/vim-tmux-kitty-navigator'
@@ -177,35 +183,22 @@ bind-key -n 'C-S-Right' if-shell "$is_vim" 'send-keys C-S-Right'  'if-shell "[ #
 ### SSH Compatibility
 -----------------
 
-With the settings above, navigation should work well locally. But if you need kitty-tmux navigation also working through SSH, consider that this only is feasible when ssh-ing and immediatly starting a tmux session. Without immediatly starting said tmux session, the script will pass keys directly to the bare remote shell wich will not work properly. So, if comfortable with always starting ssh with tmux, follow these steps:
+With the settings above, navigation should work well locally. But if you need kitty-tmux navigation also working through SSH, we need to do some extra configuration:
 
 1. Install kitty on your remote machine. [How To](https://sw.kovidgoyal.net/kitty/binary.html?highlight=install).
 2. Enable remote control forwarding.
 
-Make a new file `~/.config/kitty/ssh.conf` and add:
+Make a new file on the local machine `~/.config/kitty/ssh.conf` and add:
 
 ```conf
 forward_remote_control yes 
 ```
-3. Change these lines in `~/.config/kitty/pass_keys.py` (starting at line 59)
 
-```python
-elif is_program(w, "ssh"):  
-        print("Ssh passed")
-        for keymap in args[2].split(">"):
-             encoded = encode_key_mapping(w, keymap)
-             w.write_to_child(encoded)    
-```
-
-4. Add the following alias to your remote machine's `.bashrc` or something similar on other shell:
+That's all. Don't forget to also set an alias for kitty's builtin ssh child process:
 
 ```sh
 alias ssh="kitty +kitten ssh user@host 'tmux'"
-
 ```
-where user is the remote user and host the remote ip. Mostly note the 'tmux'. 
 
-This plugin isn't perfect, but it definitly does the job speaking strictly locally. And I believe that I, like a lot of other people, prefer starting up a tmux session while ssh'ing anyway.
-
-Don't forget to install the tmux plugin on your remote system also. 
-If you're sick of always using tmux remotly, you can always comment out lines 59 - 64 in `~/.config/kitty/pass_keys.py` again.
+This plugin isn't perfect, but it definitly does the job. 
+Don't forget to install the tmux plugin on your remote system as well. 
