@@ -1,4 +1,4 @@
-Tmux Kitty Vim Navigator
+Vim Tmux Kitty Navigator
 ==================
 
 This plugin is a combined port from
@@ -45,7 +45,7 @@ install the plugin:
 Add the following line to your `~/.vimrc` file
 
 ```vim
-Plug 'excited-bore/tmux-kitty-vim-navigator', { 'do': 'cp -f ./pass_keys.py ~/.config/kitty/'}
+Plug 'excited-bore/vim-tmux-kitty-navigator', { 'do': 'cp -f ./pass_keys.py ~/.config/kitty/'}
 
 ```
 And then run the plugin installation function (`PlugInstall`)
@@ -58,7 +58,7 @@ If you are using [lazy.nvim](https://github.com/folke/lazy.nvim). Add the follow
 
 ```lua
 {
-  "excited-bore/tmux-kitty-vim-navigator",
+  "excited-bore/vim-tmux-kitty-navigator",
   cmd = {
     "TmuxKittyNavigateLeft",
     "TmuxKittyNavigateDown",
@@ -80,17 +80,45 @@ If you want to use [lazy.nvim](https://github.com/folke/lazy.nvim), but still wa
 The configuration would become this:
 
 ```vim
-Plugin 'excited-bore/tmux-kitty-vim-navigator', { 'afterInstall': 'AfterInstallKittyTmuxVim'}
+Plugin 'excited-bore/vim-tmux-kitty-navigator', { 'afterInstall': 'AfterInstallKittyTmuxVim'}
 function! AfterInstallKittyTmuxVim()
-    call system('(cd ~/.vim/plugins/kitty-vim-tmux-navigator && cp -f ./pass_keys.py ~/.config/kitty/)')
+    call system('(cd ~/.vim/plugins/vim-tmux-kitty-navigator && cp -f ./pass_keys.py ~/.config/kitty/)')
 endf
 
 ```
 
+If you want to use custom keybinds, set `let g:tmux_kitty_navigator_no_mappings = 1`
+Again, default keybinds are:
+```
+  nnoremap <silent><C-S-Left> :<C-u>TmuxKittyNavigate Left<cr>
+  nnoremap <silent><C-S-Down> :<C-u>TmuxKittyNavigate Down<cr>
+  nnoremap <silent><C-S-Up> :<C-u>TmuxKittyNavigate Up<cr>
+  nnoremap <silent><C-S-Right> :<C-u>TmuxKittyNavigate Right<cr>
+
+  inoremap <silent><C-S-Left> <esc>:<C-u>TmuxKittyNavigate Left<cr>i
+  inoremap <silent><C-S-Down> <esc>:<C-u>TmuxKittyNavigate Down<cr>i
+  inoremap <silent><C-S-Up> <esc>:<C-u>TmuxKittyNavigate Up<cr>i
+  inoremap <silent><C-S-Right> <esc>:<C-u>TmuxKittyNavigate Right<cr>i
+
+  vnoremap <silent><C-S-Left> :<C-u>TmuxKittyNavigate Left<cr>gv
+  vnoremap <silent><C-S-Down> :<C-u>TmuxKittyNavigate Down<cr>gv
+  vnoremap <silent><C-S-Up> :<C-u>TmuxKittyNavigate Up<cr>gv
+  vnoremap <silent><C-S-Right> :<C-u>TmuxKittyNavigate Right<cr>gv
+```
+
+Also, sinds this plugin is heavily based on `vim-tmux-navigator`, it reuses some of the conf variables, namely:
+
+```
+ let g:tmux_navigator_save_on_switch
+ let g:tmux_navigator_disable_when_zoomed
+ let g:tmux_navigator_preserve_zoom
+ let g:tmux_navigator_no_wrap
+```
+You don't need to reconfigure these if you've already used `vim-tmux-navigator` and you're migrating.Also, like for the original plugin, these are all 0 at default
 
 ### KITTY
 
-In addition to copying over the `~/.vim/plugins/tmux-kitty-vim-navigator/pass_keys.py` to `~/.config/kitty/`, also add the following keybindings to your `~/.config/kitty/kitty.conf` file.
+In addition to copying over the `~/.vim/plugins/vim-tmux-kitty-navigator/pass_keys.py` to `~/.config/kitty/`, also add the following keybindings to your `~/.config/kitty/kitty.conf` file.
 
 Open kitty and press `ctrl+shift+f2` and add:
 
@@ -120,10 +148,10 @@ The listening address can be customized in your vimrc by setting `g:kitty_naviga
 
 ### TMUX
 
-If you're using [TPM](https://github.com/tmux-plugins/tpm), just add this snippet to your tmux.conf:
+If you're ok with the default keybinds (and you'r using [TPM](https://github.com/tmux-plugins/tpm)), just add this snippet to your tmux.conf:
 
 ```conf
-set -g @plugin 'excited-bore/tmux-kitty-vim-navigator'
+set -g @plugin 'excited-bore/vim-tmux-kitty-navigator'
 ```
 And update your plugin
 
@@ -134,17 +162,13 @@ Add the following snippet to your tmux.conf:
 ```sh
 # # # VIM TMUX KITTY NAVIGATOR # # #
 
-# SSH aware kitty change window
-if-shell '[ $SSH_TTY ]' 'to="--to=tcp:localhost:$KITTY_PORT "' 'to=""'
-move='kitty @ ${to} kitten focus-window --match'
-
 # Keybinds
 is_vim="ps -o state= -o comm= -t '#{pane_tty}' \
     | grep -iqE '^[^TXZ ]+ +(\\S+\\/)?g?(view|l?n?vim?x?|fzf)(diff)?$'"
-bind-key -n 'C-S-Left' if-shell "$is_vim" 'send-keys C-S-Left'  'if-shell "[ #{pane_at_left} != 1 ]" "select-pane -L" "run '"'$move neighbor:left || true'"'"'
-bind-key -n 'C-S-Down' if-shell "$is_vim" 'send-keys C-S-Down'  'if-shell "[ #{pane_at_bottom} != 1 ]" "select-pane -D" "run '"'$move neighbor:bottom || true'"'"'
-bind-key -n 'C-S-Up' if-shell "$is_vim" 'send-keys C-S-Up'  'if-shell "[ #{pane_at_top} != 1 ]" "select-pane -U" "run '"'$move neighbor:up || true'"'"'
-bind-key -n 'C-S-Right' if-shell "$is_vim" 'send-keys C-S-Right'  'if-shell "[ #{pane_at_right} != 1 ]" "select-pane -R" "run '"'$move neighbor:right || true'"'"'
+bind-key -n 'C-S-Left' if-shell "$is_vim" 'send-keys C-S-Left'  'if-shell "[ #{pane_at_left} != 1 ]" "select-pane -L" "run '"'kitten @focus-window --match neighbor:left'"'"'
+bind-key -n 'C-S-Down' if-shell "$is_vim" 'send-keys C-S-Down'  'if-shell "[ #{pane_at_bottom} != 1 ]" "select-pane -D" "run '"'kitten @focus-window --match neighbor:bottom'"'"'
+bind-key -n 'C-S-Up' if-shell "$is_vim" 'send-keys C-S-Up'  'if-shell "[ #{pane_at_top} != 1 ]" "select-pane -U" "run '"'kitten @focus-window --match neighbor:top '"'"'
+bind-key -n 'C-S-Right' if-shell "$is_vim" 'send-keys C-S-Right'  'if-shell "[ #{pane_at_right} != 1 ]" "select-pane -R" "run '"'kitten @focus-window --match neighbor:right '"'"' 
 ```
 
 ### SSH Compatibility

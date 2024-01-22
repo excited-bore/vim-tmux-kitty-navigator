@@ -21,7 +21,7 @@ if !get(g:, 'tmux_kitty_navigator_no_mappings', 0)
     vnoremap <silent><C-S-Left> :<C-u>TmuxKittyNavigate Left<cr>gv
     vnoremap <silent><C-S-Down> :<C-u>TmuxKittyNavigate Down<cr>gv
     vnoremap <silent><C-S-Up> :<C-u>TmuxKittyNavigate Up<cr>gv
-    vnoremap <silent><C-S-Right> :<C-u>TmuxKittyNavigate Right<cr>gv   n
+    vnoremap <silent><C-S-Right> :<C-u>TmuxKittyNavigate Right<cr>gv   
 endif
 
 command! TmuxKittyNavigateLeft   call s:TmuxKittyNavigate('h')
