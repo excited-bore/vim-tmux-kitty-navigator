@@ -204,8 +204,8 @@ forward_remote_control yes
 That's all. Don't forget to also set an alias for kitty's builtin ssh child process:
 
 ```sh
-alias ssh="kitty +kitten ssh user@host 'tmux'"
+alias ssh="kitten ssh user@host"
 ```
 
-This plugin isn't perfect, but it definitly does the job. 
-Don't forget to install the tmux plugin on your remote system as well. 
+This plugin isn't perfect, but it definitly does the job locally. 
+Don't forget to install the tmux plugin and wrapper on your remote system as well. 
