@@ -1,0 +1,39 @@
+*tmux-kitty-navigator.txt* Plugin to allow seamless navigation between tmux, kitty and vim
+
+==============================================================================
+CONTENTS                               *tmux-kitty-navigator-contents*
+
+
+==============================================================================
+INTRODUCTION                           *tmux-kitty-navigator*
+
+Vim-tmux-kitty-navigator is a little plugin which enables seamless navigation
+between tmux panes, kitty panes and vim splits. This plugin is a combined port of both Matthew Steedman's vim-kitty-navigator and Chris toomey's vim-tmux-navigator. 
+When combined with a set of kitty key
+bindings, the plugin will allow you to navigate seamlessly between vim splits
+and tmux/kitty panes using a consistent set of hotkeys.
+
+NOTE: This requires kitty v0.13.1 or higher.
+NOTE: This requires tmux v1.8 or higher.
+
+==============================================================================
+CONFIGURATION                             *tmux-kitty-navigator-configuration*
+
+* Activate autoupdate on exit
+ let g:tmux_navigator_save_on_switch = 1
+
+* Disable vim->tmux navigation when the Vim pane is zoomed in tmux
+ let g:tmux_navigator_disable_when_zoomed = 1
+
+* If the Vim pane is zoomed, stay zoomed when moving to another tmux pane
+ let g:tmux_navigator_preserve_zoom = 1
+
+* Custom Key Bindings
+ let g:tmux_kitty_navigator_no_mappings = 1
+
+ nnoremap <silent> {Left-mapping} :TmuxKittyNavigateLeft<cr>
+ nnoremap <silent> {Down-Mapping} :TmuxKittyNavigateDown<cr>
+ nnoremap <silent> {Up-Mapping} :TmuxKittyNavigateUp<cr>
+ nnoremap <silent> {Right-Mapping} :TmuxKittyNavigateRight<cr>
+
+ vim:tw=78:ts=8:ft=help:norl:
