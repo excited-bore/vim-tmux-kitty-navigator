@@ -197,7 +197,7 @@ elif is_program(w, "ssh"):
              w.write_to_child(encoded)    
 ```
 
-5. Add the following alias to your remote machine's `.bashrc` or something similar on other shell:
+4. Add the following alias to your remote machine's `.bashrc` or something similar on other shell:
 
 ```sh
 alias ssh="kitty +kitten ssh user@host 'tmux'"
