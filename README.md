@@ -88,6 +88,7 @@ endf
 ```
 
 If you want to use custom keybinds, set `let g:tmux_kitty_navigator_no_mappings = 1`
+
 Again, default keybinds are:
 ```
   nnoremap <silent><C-S-Left> :<C-u>TmuxKittyNavigate Left<cr>
@@ -106,7 +107,7 @@ Again, default keybinds are:
   vnoremap <silent><C-S-Right> :<C-u>TmuxKittyNavigate Right<cr>gv
 ```
 
-Also, sinds this plugin is heavily based on `vim-tmux-navigator`, it reuses some of the conf variables, namely:
+Sinds this plugin is heavily based on `vim-tmux-navigator`, it reuses some of the configuration variables, namely:
 
 ```
  let g:tmux_navigator_save_on_switch
@@ -114,7 +115,8 @@ Also, sinds this plugin is heavily based on `vim-tmux-navigator`, it reuses some
  let g:tmux_navigator_preserve_zoom
  let g:tmux_navigator_no_wrap
 ```
-You don't need to reconfigure these if you've already used `vim-tmux-navigator` and you're migrating.Also, like for the original plugin, these are all 0 at default
+You don't need to reconfigure these if you've already used `vim-tmux-navigator` and you're migrating.
+Also, like for the original plugin, these are all 0 at default
 
 ### KITTY
 
