@@ -45,7 +45,7 @@ install the plugin:
 Add the following line to your `~/.vimrc` file
 
 ```vim
-Plug 'excited-bore/vim-tmux-kitty-navigator', { 'do': 'cp -f ./pass_keys.py ~/.config/kitty/'}
+Plug 'excited-bore/vim-tmux-kitty-navigator', { 'do': 'cp -f ./*.py ~/.config/kitty/'}
 
 ```
 And then run the plugin installation function (`PlugInstall`)
