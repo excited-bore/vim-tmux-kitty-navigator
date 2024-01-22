@@ -13,7 +13,7 @@ def is_process(window, vim_id):
 
 def is_env(window):
     env = window.child.environ 
-    if "Iexist" in env:
+    if "TMUX" in env and env["TMUX"] != "":
         return True
     else:
         return False
