@@ -82,7 +82,7 @@ The configuration would become this:
 ```vim
 Plugin 'excited-bore/vim-tmux-kitty-navigator', { 'afterInstall': 'AfterInstallKittyTmuxVim'}
 function! AfterInstallKittyTmuxVim()
-    call system('(cd ~/.vim/plugins/vim-tmux-kitty-navigator && cp -f ./pass_keys.py ~/.config/kitty/)')
+    call system('(cd ~/.vim/plugins/vim-tmux-kitty-navigator && cp -f ./*.py ~/.config/kitty/)')
 endf
 
 ```
@@ -90,7 +90,8 @@ endf
 If you want to use custom keybinds, set `let g:tmux_kitty_navigator_no_mappings = 1`
 
 Again, default keybinds are:
-```
+
+```vim
   nnoremap <silent><C-S-Left> :<C-u>TmuxKittyNavigate Left<cr>
   nnoremap <silent><C-S-Down> :<C-u>TmuxKittyNavigate Down<cr>
   nnoremap <silent><C-S-Up> :<C-u>TmuxKittyNavigate Up<cr>
@@ -109,7 +110,7 @@ Again, default keybinds are:
 
 Sinds this plugin is heavily based on `vim-tmux-navigator`, it reuses some of the configuration variables, namely:
 
-```
+```vim
  let g:tmux_navigator_save_on_switch
  let g:tmux_navigator_disable_when_zoomed
  let g:tmux_navigator_preserve_zoom
@@ -120,7 +121,7 @@ Also, like for the original plugin, these are all 0 at default
 
 ### KITTY
 
-In addition to copying over the `~/.vim/plugins/vim-tmux-kitty-navigator/pass_keys.py` to `~/.config/kitty/`, also add the following keybindings to your `~/.config/kitty/kitty.conf` file.
+In addition to copying over the `pass_keys.py` and `get_layout.py` to `~/.config/kitty/`, also add the following keybindings to your `~/.config/kitty/kitty.conf` file.
 
 Open kitty and press `ctrl+shift+f2` and add:
 
@@ -142,7 +143,7 @@ listen_on unix:/tmp/mykitty
 
 Start kitty with the `listen_on` option so that vim can send commands to it.
 
-```
+```conf
 kitty -o allow_remote_control=yes --listen-on unix:/tmp/mykitty
 ```
 
@@ -183,11 +184,12 @@ With the settings above, navigation should work well locally. But if you need ki
 
 Make a new file `~/.config/kitty/ssh.conf` and add:
 
-```
+```conf
 forward_remote_control yes 
 ```
 3. Change these lines in `~/.config/kitty/pass_keys.py` (starting at line 59)
-```
+
+```python
 elif is_program(w, "ssh"):  
         print("Ssh passed")
         for keymap in args[2].split(">"):

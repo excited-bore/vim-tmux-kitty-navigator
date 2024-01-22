@@ -1,4 +1,4 @@
-" Maps <C-h/j/k/l> to switch vim splits in the given direction. If there are
+" Maps <C-S-Left/Down/Up/Right> to switch vim splits in the given direction. If there are
 " no more windows in that direction, forwards the operation to kitty.
 
 if exists("g:loaded_tmux_kitty_navigator") || &cp || v:version < 700
@@ -6,32 +6,38 @@ if exists("g:loaded_tmux_kitty_navigator") || &cp || v:version < 700
 endif
 let g:loaded_tmux_kitty_navigator = 1
 
+command! TmuxKittyNavigateLeft   call TmuxKittyNavigate('h')
+command! TmuxKittyNavigateDown   call TmuxKittyNavigate('j')
+command! TmuxKittyNavigateUp     call TmuxKittyNavigate('k')
+command! TmuxKittyNavigateRight  call TmuxKittyNavigate('l') 
 
 if !get(g:, 'tmux_kitty_navigator_no_mappings', 0)
-    nnoremap <silent><C-S-Left> :<C-u>TmuxKittyNavigate Left<cr>
-    nnoremap <silent><C-S-Down> :<C-u>TmuxKittyNavigate Down<cr>
-    nnoremap <silent><C-S-Up> :<C-u>TmuxKittyNavigate Up<cr>
-    nnoremap <silent><C-S-Right> :<C-u>TmuxKittyNavigate Right<cr>
+    nnoremap <silent><C-S-Left> :<C-u>TmuxKittyNavigateLeft<cr>
+    nnoremap <silent><C-S-Down> :<C-u>TmuxKittyNavigateDown<cr>
+    nnoremap <silent><C-S-Up> :<C-u>TmuxKittyNavigateUp<cr>
+    nnoremap <silent><C-S-Right> :<C-u>TmuxKittyNavigateRight<cr>
 
-    inoremap <silent><C-S-Left> <esc>:<C-u>TmuxKittyNavigate Left<cr>i
-    inoremap <silent><C-S-Down> <esc>:<C-u>TmuxKittyNavigate Down<cr>i
-    inoremap <silent><C-S-Up> <esc>:<C-u>TmuxKittyNavigate Up<cr>i
-    inoremap <silent><C-S-Right> <esc>:<C-u>TmuxKittyNavigate Right<cr>i
+    inoremap <silent><C-S-Left> <esc>:<C-u>TmuxKittyNavigateLeft<cr>i
+    inoremap <silent><C-S-Down> <esc>:<C-u>TmuxKittyNavigateDown<cr>i
+    inoremap <silent><C-S-Up> <esc>:<C-u>TmuxKittyNavigateUp<cr>i
+    inoremap <silent><C-S-Right> <esc>:<C-u>TmuxKittyNavigateRight<cr>i
 
-    vnoremap <silent><C-S-Left> :<C-u>TmuxKittyNavigate Left<cr>gv
-    vnoremap <silent><C-S-Down> :<C-u>TmuxKittyNavigate Down<cr>gv
-    vnoremap <silent><C-S-Up> :<C-u>TmuxKittyNavigate Up<cr>gv
-    vnoremap <silent><C-S-Right> :<C-u>TmuxKittyNavigate Right<cr>gv   
+    vnoremap <silent><C-S-Left> :<C-u>TmuxKittyNavigateLeft<cr>gv
+    vnoremap <silent><C-S-Down> :<C-u>TmuxKittyNavigateDown<cr>gv
+    vnoremap <silent><C-S-Up> :<C-u>TmuxKittyNavigateUp<cr>gv
+    vnoremap <silent><C-S-Right> :<C-u>TmuxKittyNavigateRight<cr>gv   
 endif
-
-command! TmuxKittyNavigateLeft   call s:TmuxKittyNavigate('h')
-command! TmuxKittyNavigateDown   call s:TmuxKittyNavigate('j')
-command! TmuxKittyNavigateUp     call s:TmuxKittyNavigate('k')
-command! TmuxKittyNavigateRight  call s:TmuxKittyNavigate('l')
 
 
 let s:mappings = {'h': 'left', 'j': 'bottom', 'k': 'top', 'l': 'right'}
 
+function! s:VimNavigate(direction)
+  try
+    execute 'wincmd ' . a:direction
+  catch
+    echohl ErrorMsg | echo 'E11: Invalid in command-line window; <CR> executes, CTRL-C quits: wincmd k' | echohl None
+  endtry
+endfunction
 
 "####### TMUX ########
 " https://github.com/NikoKS/kitty-vim-tmux-navigator
@@ -101,7 +107,7 @@ function! s:TmuxAwareNavigate(direction)
     let nr = winnr() 
     let tmux_last_pane = (a:direction == 'p' && s:tmux_is_last_pane)
     if !tmux_last_pane
-    call s:VimNavigate(a:direction)
+        call s:VimNavigate(a:direction)
     endif
     let at_tab_page_edge = (nr == winnr())
     " Forward the switch panes command to tmux if:
@@ -184,13 +190,13 @@ endfunction
 
 function! TmuxKittyNavigate(direction)
     if empty($TMUX)  
-        execute "KittyNavigate" .. s:mappings[a:direction] 
+        call s:KittyAwareNavigate(a:direction)
     else
         let isLast = system('tmux display-message -p -F "#{pane_at_' .. s:mappings[a:direction] .. '}"')
         if isLast == 1
-            call s:KittyAwareNavigate(s:mappings[a:direction])
+            call s:KittyAwareNavigate(a:direction)
         else
-            call s:TmuxAwareNavigate(s:mappings[a:direction])
+            call s:TmuxAwareNavigate(a:direction)
         endif
     endif
-endfunction
+endfunction 

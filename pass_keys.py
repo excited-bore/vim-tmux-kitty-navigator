@@ -57,12 +57,12 @@ def handle_result(args, result, target_window_id, boss):
         for keymap in args[2].split(">"):
             encoded = encode_key_mapping(w, keymap)
             w.write_to_child(encoded)
-    elif is_program(w, "ssh"):  
-        print("Ssh passed")
-        # Tmux is empty
-        for keymap in args[2].split(">"):
-            encoded = encode_key_mapping(w, keymap)
-            w.write_to_child(encoded) 
+    # elif is_program(w, "ssh"):  
+        # print("Ssh passed")
+        # # Tmux is empty
+        # for keymap in args[2].split(">"):
+            # encoded = encode_key_mapping(w, keymap)
+            # w.write_to_child(encoded) 
     # keywords not found, move to neighboring window instead
     else:
         print(args[1])
