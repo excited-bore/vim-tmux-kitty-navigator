@@ -7,16 +7,21 @@ import os
 def main():
     pass
 
-def is_process(window, vim_id):
+def is_vim(window, vim_id):
     fp = window.child.foreground_processes
     return any(re.search(vim_id, p['cmdline'][0] if len(p['cmdline']) else '', re.I) for p in fp)
 
-def is_env(window):
-    env = window.child.environ 
-    if "TMUX" in env and env["TMUX"] != "":
+def is_tmux(window, tmux_id):
+    ansr = os.popen(tmux_id).read()
+    in_title=window.child_title
+    print(in_title)
+    # Is there a tmux client in a kittten, or (for ssh) just a simple check whether tmux is in title?
+    # This isn't the best method but we steer with the rows we got
+    if "tmux: client" in ansr or "tmux" in in_title:
         return True
     else:
         return False
+
 
 def encode_key_mapping(window, key_mapping):
     mods, key = parse_shortcut(key_mapping)
@@ -49,15 +54,17 @@ def handle_result(args, result, target_window_id, boss):
     # get active window and tab from target_window_id
     w = boss.window_id_map.get(target_window_id)    
     vim_id = "n?vim"
+    tmux_id = "pstree -stp $(kitten @ ls | grep \"pid\" | tail -1 | head -1 | sed 's|.* \(.*\),|\1|' | grep 'tmux: client')"
+    
     if w is None:
         return
      
-    if is_env(w):
+    if is_tmux(w, tmux_id):
         print("Tmux passed")
         for keymap in args[2].split(">"):
             encoded = encode_key_mapping(w, keymap)
             w.write_to_child(encoded)
-    elif is_process(w, vim_id):  
+    elif is_vim(w, vim_id):  
         print("(N)vim passed")
         # Tmux is empty
         for keymap in args[2].split(">"):
@@ -65,7 +72,6 @@ def handle_result(args, result, target_window_id, boss):
             w.write_to_child(encoded)
     # keywords not found, move to neighboring window instead
     else:
-        print(args[1])
         boss.active_tab.neighboring_window(args[1])
 
 handle_result.no_ui = True
