@@ -11,13 +11,13 @@ def is_vim(window, vim_id):
     fp = window.child.foreground_processes
     return any(re.search(vim_id, p['cmdline'][0] if len(p['cmdline']) else '', re.I) for p in fp)
 
-def is_tmux(window, tmux_id):
-    ansr = os.popen(tmux_id).read()
+def is_tmux(window):
+    #ansr = os.popen(tmux_id).read()
     in_title=window.child_title
     print(in_title)
     # Is there a tmux client in a kittten, or (for ssh) just a simple check whether tmux is in title?
     # This isn't the best method but we steer with the rows we got
-    if "tmux: client" in ansr or "tmux" in in_title:
+    if "tmux" in in_title:
         return True
     else:
         return False
@@ -54,7 +54,7 @@ def handle_result(args, result, target_window_id, boss):
     # get active window and tab from target_window_id
     w = boss.window_id_map.get(target_window_id)    
     vim_id = "n?vim"
-    tmux_id = "pstree -stp $(kitten @ ls | grep \"pid\" | tail -1 | head -1 | sed 's|.* \(.*\),|\1|' | grep 'tmux: client')"
+    #tmux_id = "pstree -stp $(kitten @ ls | grep \"pid\" | tail -1 | head -1 | sed 's|.* \(.*\),|\1|' | grep 'tmux: client')"
     
     if w is None:
         return
