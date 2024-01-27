@@ -59,7 +59,7 @@ def handle_result(args, result, target_window_id, boss):
     if w is None:
         return
      
-    if is_tmux(w, tmux_id):
+    if is_tmux(w):
         print("Tmux passed")
         for keymap in args[2].split(">"):
             encoded = encode_key_mapping(w, keymap)
