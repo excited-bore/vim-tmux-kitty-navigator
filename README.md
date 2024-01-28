@@ -12,6 +12,7 @@ The aim is excactly the same: to make navigation between Kitty windows, tmux pan
 The script works by letting a childprocess of kitty (kitten) detect what kind of programs are running and passing encoded keymappings based on whether it's vim. 
 For tmux, wich is set using pathvariables, we have to reinitialize our pane everytime we start/close a tmux session so we can manually appoint tmux' pathvariable.
 
+Also, nvim can't do system calls as root unless file is specifically opened with sudo, so the plugiwon't respond.  
 
 **NOTE**:
 - This requires kitty v0.13.1 or higher.
@@ -79,7 +80,7 @@ If you want to use [lazy.nvim](https://github.com/folke/lazy.nvim), but still wa
 The configuration would become this:
 
 ```vim
-Plugin 'excited-bore/vim-tmux-kitty-navigator', { 'build': 'cd ~/.vim/plugins/vim-tmux-kitty-navigator && cp -f ./*.py ~/.config/kitty/'}
+Plugin 'excited-bore/vim-tmux-kitty-navigator', { 'build': 'mkdir -p ~/.config/kitty/ && cd ~/.vim/plugins/vim-tmux-kitty-navigator && cp -f ./*.py ~/.config/kitty/'}
 ```
 
 ## Custom keybinds

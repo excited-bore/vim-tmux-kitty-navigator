@@ -1,6 +1,5 @@
 " Maps <C-S-Left/Down/Up/Right> to switch vim splits in the given direction. If there are
 " no more windows in that direction, forwards the operation to kitty.
-:autocmd BufWinLeave * !
 
 if exists("g:loaded_tmux_kitty_navigator") || &cp || v:version < 700
   finish
